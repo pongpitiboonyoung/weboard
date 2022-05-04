@@ -37,13 +37,13 @@ const schema = new mongoose.Schema({
     collection: 'member',
     timestamps: { createdAt: 'created_at', updatedAt: 'update_at' }
 });
-
+// NOTE hash password
 schema.statics.encryptPassword = async function (password) {
     const salt = await bcrypt.genSalt(5);
     const hashPassword = await bcrypt.hash(password, salt);
     return hashPassword;
 }
-
+// NOTE check password
 schema.statics.checkPassword = async function (password, hash) {
     const isValid = await bcrypt.compare(password, hash);
     return isValid;
@@ -52,7 +52,7 @@ schema.statics.checkPassword = async function (password, hash) {
 const user = mongoose.model('User', schema);
 
 module.exports = user;
-
+// NOTE setting first admin 
 setTimeout(async () => {
     try {
         let find = await user.find({ role: "admin" })
