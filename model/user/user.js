@@ -5,6 +5,7 @@ const schema = new mongoose.Schema({
     img: {
         filename : {
             type : String,
+            default: null
         }
     },
     name: {

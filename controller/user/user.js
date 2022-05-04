@@ -4,6 +4,8 @@ const { find } = require('../../model/user/user')
 const fs = require('fs')
 
 const multer = require('multer')
+const { resolve } = require('path')
+const { rejects } = require('assert')
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -70,18 +72,30 @@ exports.edit_profile = async function (req, res, next) {
             { _id: req.session.member._id },
             {
                 $set: {
-                    img: req.file ? req.file : null,
+                    img: req.file ? req.file : find.img,
                     name: req.body.name,
                     email: req.body.email,
+                }
+            })
+        if (req.file && update.modifiedCount != 0) {
+            remove_file(find.img.filename).then((result) => { console.log(result) }).catch((e) => { console.log(e) })
+        }
+        res.send({ status: true, msg: 'succes', data: update })
+    } catch (e) {
+        console.log(e)
+        next(e)
+    }
+}
+// NOTE edit password
+exports.edit_password = async function (req, res, next) {
+    try {
+        let update = await User.updateOne(
+            { _id: req.session.member._id },
+            {
+                $set: {
                     password: await User.encryptPassword(req.body.password)
                 }
             })
-        fs.unlink(`./public/uploads/${find.img.filename}`, (err) => {
-            if (err) {
-                console.log(err);
-            }
-            console.log('deleted');
-        })
         res.send({ status: true, msg: 'succes', data: update })
     } catch (e) {
         console.log(e)
@@ -107,4 +121,15 @@ exports.profile = async function (req, res, next) {
         console.log(e)
         next(e)
     }
+}
+
+function remove_file(filename) {
+    return new Promise((resolve, rejects) => {
+        fs.unlink(`./public/uploads/${filename}`, (err) => {
+            if (err) {
+                resolve(err);
+            }
+            resolve('deleted');
+        })
+    })
 }
