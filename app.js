@@ -4,10 +4,10 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const db = require('./db/db')
-var session = require('express-session')
+const session = require('express-session')
+const fs = require('fs')
 // var indexRouter = require('./routes/index');
 // var usersRouter = require('./routes/users');
-
 var app = express();
 
 // view engine setup
@@ -38,19 +38,27 @@ user(app)
 
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   next(createError(404));
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   // res.locals.message = err.message;
   // res.locals.error = req.app.get('env') === 'development' ? err : {};
   // // render the error page
   // res.status(err.status || 500);
   // res.render('error');
-  res.status(400).send({status : false , msg : err.message , data : null})
+  res.status(400).send({ status: false, msg: err.message, data: null })
+});
+
+fs.mkdir(path.join(__dirname + "/public/", 'uploads'),
+  { recursive: true }, (err) => {
+  if (err) {
+    return console.error(err);
+  }
+  console.log('Directory created successfully!');
 });
 
 module.exports = app;
