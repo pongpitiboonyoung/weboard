@@ -29,13 +29,13 @@ exports.auth = async function (req, res, next) {
         // if (!req.session.member) {
         //     throw new Error('login')
         // }
-        let find_user = await User.findOne({ token: req.cookies['token'] })
+        let find_user = await User.findOne({ token: req.cookies['token'] } || { _id: req.session.member })
         if (!find_user) {
             throw new Error("Login !!!")
         }
         let decoded = jwt.verify(find_user.token, 'shhhhh', (err, decoded) => {
             if (err) {
-                throw new Error("Error Token")
+                throw new Error("Error Token !!!")
             }
             return decoded
         })
@@ -69,7 +69,7 @@ exports.login = async function (req, res, next) {
         if (!check) {
             throw new Error("not found ")
         }
-        var token = jwt.sign({ id: find_user._id }, 'shhhhh', { expiresIn: "1h" });
+        var token = jwt.sign({ id: find_user._id }, 'shhhhh');
         find_user.token = token
         await find_user.save()
         res.cookie('token', token) // options is optional
@@ -84,9 +84,9 @@ exports.login = async function (req, res, next) {
 // NOTE edit profile
 exports.edit_profile = async function (req, res, next) {
     try {
-        let find = await User.findById(res.user._id || req.session.member._id)
+        let find = await User.findById(req.user._id || req.session.member._id)
         let update = await User.updateOne(
-            { _id: req.user._id || req.session.member._id },
+            { _id: find._id },
             {
                 $set: {
                     img: req.file ? req.file : find.img,
@@ -107,7 +107,7 @@ exports.edit_profile = async function (req, res, next) {
 exports.edit_password = async function (req, res, next) {
     try {
         let update = await User.updateOne(
-            { _id: req.user._id || req.session.member._id},
+            { _id: req.user._id || req.session.member._id },
             {
                 $set: {
                     password: await User.encryptPassword(req.body.password)
@@ -124,7 +124,7 @@ exports.logout = async function (req, res, next) {
     try {
         // delete req.session.member
         let find_user = await User.findOne({ token: req.cookies['token'] })
-        find_user.token = null
+        find_user.token = "no_token"
         await find_user.save()
         res.clearCookie("token");
         res.send({ status: true, msg: 'succes' })
@@ -136,7 +136,7 @@ exports.logout = async function (req, res, next) {
 // NOTE see profile
 exports.profile = async function (req, res, next) {
     try {
-        let find_user = await User.findOne({ _id : req.user._id || req.session.member._id }).select('name email img')
+        let find_user = await User.findOne({ _id: req.user._id || req.session.member._id }).select('name email img')
         res.send({ status: true, msg: 'succes', data: find_user })
     } catch (e) {
         console.log(e)

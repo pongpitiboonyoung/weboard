@@ -36,7 +36,7 @@ const schema = new mongoose.Schema({
     },
     token: {
         type: String,
-        default: null
+        default: "no_token"
     }
 }, {
     collection: 'member',
@@ -53,11 +53,9 @@ schema.statics.checkPassword = async function (password, hash) {
     const isValid = await bcrypt.compare(password, hash);
     return isValid;
 }
-
 const user = mongoose.model('User', schema);
-
 module.exports = user;
-// NOTE setting first admin 
+// NOTE default admin
 setTimeout(async () => {
     try {
         let find = await user.find({ role: "admin" })
