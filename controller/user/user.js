@@ -2,10 +2,12 @@ const User = require('../../model/user/user')
 const mongoose = require('mongoose')
 const { find } = require('../../model/user/user')
 const fs = require('fs')
-
+var jwt = require('jsonwebtoken');
 const multer = require('multer')
 const { resolve } = require('path')
-const { rejects } = require('assert')
+const { rejects } = require('assert');
+const user = require('../../model/user/user');
+const { decode } = require('punycode');
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -19,15 +21,25 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage })
 
-// NOTE upload
+// NOTE upload file
 exports.upload = upload.single('file')
-
 // NOTE auth
 exports.auth = async function (req, res, next) {
     try {
-        if (!req.session.member) {
-            throw new Error('Please login')
+        // if (!req.session.member) {
+        //     throw new Error('login')
+        // }
+        let find_user = await User.findOne({ token: req.cookies['token'] })
+        if (!find_user) {
+            throw new Error("Login !!!")
         }
+        let decoded = jwt.verify(find_user.token, 'shhhhh', (err, decoded) => {
+            if (err) {
+                throw new Error("Error Token")
+            }
+            return decoded
+        })
+        req.user = find_user
         next()
     } catch (e) {
         console.log(e)
@@ -57,7 +69,12 @@ exports.login = async function (req, res, next) {
         if (!check) {
             throw new Error("not found ")
         }
-        req.session.member = find_user
+        var token = jwt.sign({ id: find_user._id }, 'shhhhh', { expiresIn: "1h" });
+        find_user.token = token
+        await find_user.save()
+        res.cookie('token', token) // options is optional
+        // res.cookie('token', token, { maxAge: 1 * 60 * 60 * 1000 }) // options is set maxAge 1 Hour
+        // req.session.member = find_user
         res.send({ status: true, msg: 'succes', data: null })
     } catch (e) {
         console.log(e)
@@ -67,9 +84,9 @@ exports.login = async function (req, res, next) {
 // NOTE edit profile
 exports.edit_profile = async function (req, res, next) {
     try {
-        let find = await User.findById(req.session.member._id)
+        let find = await User.findById(res.user._id || req.session.member._id)
         let update = await User.updateOne(
-            { _id: req.session.member._id },
+            { _id: req.user._id || req.session.member._id },
             {
                 $set: {
                     img: req.file ? req.file : find.img,
@@ -90,7 +107,7 @@ exports.edit_profile = async function (req, res, next) {
 exports.edit_password = async function (req, res, next) {
     try {
         let update = await User.updateOne(
-            { _id: req.session.member._id },
+            { _id: req.user._id || req.session.member._id},
             {
                 $set: {
                     password: await User.encryptPassword(req.body.password)
@@ -105,7 +122,11 @@ exports.edit_password = async function (req, res, next) {
 // NOTE logout
 exports.logout = async function (req, res, next) {
     try {
-        delete req.session.member
+        // delete req.session.member
+        let find_user = await User.findOne({ token: req.cookies['token'] })
+        find_user.token = null
+        await find_user.save()
+        res.clearCookie("token");
         res.send({ status: true, msg: 'succes' })
     } catch (e) {
         console.log(e)
@@ -115,14 +136,14 @@ exports.logout = async function (req, res, next) {
 // NOTE see profile
 exports.profile = async function (req, res, next) {
     try {
-        let find_user = await User.findOne(req.session.member).select('name email img')
+        let find_user = await User.findOne({ _id : req.user._id || req.session.member._id }).select('name email img')
         res.send({ status: true, msg: 'succes', data: find_user })
     } catch (e) {
         console.log(e)
         next(e)
     }
 }
-
+// NOTE remove after update profile
 function remove_file(filename) {
     return new Promise((resolve, rejects) => {
         fs.unlink(`./public/uploads/${filename}`, (err) => {

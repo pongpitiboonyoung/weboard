@@ -33,6 +33,10 @@ const schema = new mongoose.Schema({
     role: {
         type: String,
         default: 'member'
+    },
+    token: {
+        type: String,
+        default: null
     }
 }, {
     collection: 'member',
