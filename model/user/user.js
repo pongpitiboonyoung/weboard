@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
-
+const autoIncrement = require('mongoose-auto-increment');
+autoIncrement.initialize(mongoose.connection);
 const schema = new mongoose.Schema({
     img: {
         filename : {
@@ -28,7 +29,7 @@ const schema = new mongoose.Schema({
         type: String,
         required: true,
         trim: true,
-        minlength: 3
+        minlength: 6
     },
     role: {
         type: String,
@@ -42,6 +43,7 @@ const schema = new mongoose.Schema({
     collection: 'member',
     timestamps: { createdAt: 'created_at', updatedAt: 'update_at' }
 });
+
 // NOTE hash password
 schema.statics.encryptPassword = async function (password) {
     const salt = await bcrypt.genSalt(5);
@@ -53,10 +55,20 @@ schema.statics.checkPassword = async function (password, hash) {
     const isValid = await bcrypt.compare(password, hash);
     return isValid;
 }
+
+schema.plugin(autoIncrement.plugin, {
+    model: 'User',
+    field: '_id',
+    startAt: 1,
+    incrementBy: 1
+});
+
 const user = mongoose.model('User', schema);
+
 module.exports = user;
-// NOTE default admin
-setTimeout(async () => {
+
+//NOTE default admin
+let created_admin = async () => {
     try {
         let find = await user.find({ role: "admin" })
         if ( find.length > 0 ) {
@@ -73,4 +85,5 @@ setTimeout(async () => {
     } catch (e) {
         console.log(e.message)
     }
-}, 1000);
+};
+created_admin()

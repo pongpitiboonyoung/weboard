@@ -1,13 +1,8 @@
 const User = require('../../model/user/user')
-const mongoose = require('mongoose')
-const { find } = require('../../model/user/user')
+
 const fs = require('fs')
-var jwt = require('jsonwebtoken');
-const multer = require('multer')
-const { resolve } = require('path')
-const { rejects } = require('assert');
-const user = require('../../model/user/user');
-const { decode } = require('punycode');
+const jwt = require('jsonwebtoken');
+const multer = require('multer');
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
