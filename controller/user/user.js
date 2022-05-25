@@ -3,7 +3,6 @@ const User = require('../../model/user/user')
 const fs = require('fs')
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
-
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, './public/uploads')
@@ -27,7 +26,7 @@ exports.auth = async function (req, res, next) {
         if (!find_user) {
             throw new Error("Login !!!")
         }
-        let decoded = jwt.verify(find_user.token, 'shhhhh', (err, decoded) => {
+        let decoded = jwt.verify(find_user.token, process.env.Secret, (err, decoded) => {
             if (err) {
                 throw new Error("Error Token !!!")
             }
@@ -63,7 +62,7 @@ exports.login = async function (req, res, next) {
         if (!check) {
             throw new Error("not found ")
         }
-        var token = jwt.sign({ id: find_user._id }, 'shhhhh');
+        var token = jwt.sign({ id: find_user._id }, process.env.Secret);
         find_user.token = token
         await find_user.save()
         res.cookie('token', token) // options is optional
