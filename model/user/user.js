@@ -86,4 +86,5 @@ let created_admin = async () => {
         console.log(e.message)
     }
 };
+
 created_admin()

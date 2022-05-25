@@ -7,6 +7,8 @@ var logger = require('morgan');
 const db = require('./db/db')
 const session = require('express-session')
 const fs = require('fs')
+const xss = require('xss-clean')
+const mongoSanitize = require('express-mongo-sanitize');
 // var indexRouter = require('./routes/index');
 // var usersRouter = require('./routes/users');
 var app = express();
@@ -24,7 +26,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // app.use('/', indexRouter);
 // app.use('/users', usersRouter);
-
+app.use(xss())
+app.use(mongoSanitize());
 // session
 var sess = {
   secret: 'keyboard cat',
