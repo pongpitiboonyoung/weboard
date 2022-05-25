@@ -8,6 +8,7 @@ const db = require('./db/db')
 const session = require('express-session')
 const fs = require('fs')
 const xss = require('xss-clean')
+const cors = require('cors')
 const mongoSanitize = require('express-mongo-sanitize');
 const app = express();
 
@@ -20,6 +21,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
 // session
 var sess = {
   secret: 'keyboard cat',
@@ -27,10 +29,12 @@ var sess = {
   saveUninitialized: true,
   cookie: {}
 }
-app.use(session(sess))
 
+app.use(cors())
 app.use(xss())
 app.use(mongoSanitize());
+app.use(session(sess))
+
 //all router
 let user = require('./routes/user/router')
 let webboard = require('./routes/weboard/router')
@@ -51,7 +55,7 @@ app.use(function (err, req, res, next) {
   // res.render('error');
   res.status(err.status || 400).send({ status: false, msg: err.message, data: null })
 });
-
+// create folder uploads in public
 fs.mkdir(path.join(__dirname + "/public/", 'uploads'),
   { recursive: true }, (err) => {
   if (err) {
