@@ -15,7 +15,6 @@ const storage = multer.diskStorage({
 })
 
 const upload = multer({ storage: storage })
-
 // NOTE upload file
 exports.upload = upload.single('file')
 // NOTE auth
