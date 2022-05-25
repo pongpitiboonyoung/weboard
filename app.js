@@ -26,8 +26,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // app.use('/', indexRouter);
 // app.use('/users', usersRouter);
-app.use(xss())
-app.use(mongoSanitize());
 // session
 var sess = {
   secret: 'keyboard cat',
@@ -37,6 +35,8 @@ var sess = {
 }
 app.use(session(sess))
 
+app.use(xss())
+app.use(mongoSanitize());
 //all router
 let user = require('./routes/user/router')
 let webboard = require('./routes/weboard/router')
