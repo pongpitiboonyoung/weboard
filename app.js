@@ -23,7 +23,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-
 // app.use('/', indexRouter);
 // app.use('/users', usersRouter);
 // session
@@ -56,7 +55,7 @@ app.use(function (err, req, res, next) {
   // // render the error page
   // res.status(err.status || 500);
   // res.render('error');
-  res.status(400).send({ status: false, msg: err.message, data: null })
+  res.status(err.status || 400).send({ status: false, msg: err.message, data: null })
 });
 
 fs.mkdir(path.join(__dirname + "/public/", 'uploads'),
