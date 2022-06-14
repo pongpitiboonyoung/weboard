@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
-const Webbaord = require('./webboard')
+const Post = require('./post')
 
 module.exports = async function (app) {
-    app.use(Webbaord)
+    app.use('/api/post',Post)
 };

@@ -37,10 +37,10 @@ app.use(mongoSanitize());
 app.use(session(sess))
 
 //all router
-let user = require('./routes/user/router')
-let webboard = require('./routes/weboard/router')
-user(app)
-webboard(app)
+let User = require('./routes/user/router')
+let Post = require('./routes/post/router')
+User(app)
+Post(app)
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

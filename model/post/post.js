@@ -3,33 +3,32 @@ const bcrypt = require('bcryptjs');
 const autoIncrement = require('mongoose-auto-increment');
 autoIncrement.initialize(mongoose.connection);
 const schema = new mongoose.Schema({
-    img: {
-        filename : {
-            type : String,
-            default: null
-        }
-    },
     post : {
         type: String,
         required: true,
         trim: true
+    },
+    created_by : {
+        type: Number,
+        required: true,
+        ref : "User"
     },
     deleted: {
         type: Boolean,
         default: null,
     },
 }, {
-    collection: 'webboard',
+    collection: 'Post',
     timestamps: { createdAt: 'created_at', updatedAt: 'update_at' }
 });
 
 schema.plugin(autoIncrement.plugin, {
-    model: 'Webboard',
+    model: 'Post',
     field: '_id',
     startAt: 1,
     incrementBy: 1
 });
 
-const webboard = mongoose.model('Webboard', schema);
+const Post = mongoose.model('Post', schema);
 
-module.exports = webboard;
+module.exports = Post;
