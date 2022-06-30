@@ -76,7 +76,7 @@ let created_admin = async () => {
         }
         let admin = new user({
             name: 'admin',
-            email: 'not found',
+            email: 'admin',
             password: await user.encryptPassword("123456789"),
             role: "admin"
         })
