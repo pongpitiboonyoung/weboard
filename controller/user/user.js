@@ -25,7 +25,7 @@ exports.register = async function (req, res, next) {
             password: await User.encryptPassword(req.body.password)
         })
         await user.save()
-        res.send({ status: true, msg: 'succes', data: user })
+        res.status(200).send({ status: true, msg: 'succes', data: user })
     } catch (e) {
         console.log(e)
         next(e)
@@ -45,7 +45,7 @@ exports.login = async function (req, res, next) {
         res.cookie('token', token) // options is optional
         // res.cookie('token', token, { maxAge: 1 * 60 * 60 * 1000 }) // options is set maxAge 1 Hour
         // req.session.member = find_user
-        res.send({ status: true, msg: 'succes', data: null })
+        res.status(200).send({ status: true, msg: 'succes', data: null })
     } catch (e) {
         console.log(e)
         next(e)
@@ -67,7 +67,7 @@ exports.edit_profile = async function (req, res, next) {
         if (req.file && update.modifiedCount != 0) {
             remove_file(find.img.filename).then((result) => { console.log(result) }).catch((e) => { console.log(e) })
         }
-        res.send({ status: true, msg: 'succes', data: update })
+        res.status(200).send({ status: true, msg: 'succes', data: update })
     } catch (e) {
         console.log(e)
         next(e)
@@ -83,7 +83,7 @@ exports.edit_password = async function (req, res, next) {
                     password: await User.encryptPassword(req.body.password)
                 }
             })
-        res.send({ status: true, msg: 'succes', data: update })
+        res.status(200).send({ status: true, msg: 'succes', data: update })
     } catch (e) {
         console.log(e)
         next(e)
@@ -97,7 +97,7 @@ exports.logout = async function (req, res, next) {
         find_user.token = "no_token"
         await find_user.save()
         res.clearCookie("token");
-        res.send({ status: true, msg: 'succes' })
+        res.status(200).send({ status: true, msg: 'succes' })
     } catch (e) {
         console.log(e)
         next(e)
@@ -107,7 +107,7 @@ exports.logout = async function (req, res, next) {
 exports.profile = async function (req, res, next) {
     try {
         let find_user = await User.findOne({ _id: req.user._id || req.session.member._id }).select('name email img')
-        res.send({ status: true, msg: 'succes', data: find_user })
+        res.status(200).send({ status: true, msg: 'succes', data: find_user })
     } catch (e) {
         console.log(e)
         next(e)
