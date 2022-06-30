@@ -2,20 +2,7 @@ const User = require('../../model/user/user')
 
 const fs = require('fs')
 const jwt = require('jsonwebtoken');
-const multer = require('multer');
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, './public/uploads')
-    },
-    filename: function (req, file, cb) {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
-        cb(null, uniqueSuffix + file.originalname)
-    }
-})
 
-const upload = multer({ storage: storage })
-// NOTE upload file
-exports.upload = upload.single('file')
 // NOTE register
 exports.register = async function (req, res, next) {
     try {
