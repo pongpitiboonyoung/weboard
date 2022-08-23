@@ -14,7 +14,7 @@ exports.register = async function (req, res, next) {
         await user.save()
         res.status(200).send({ status: true, msg: 'succes', data: user })
     } catch (e) {
-        console.log(e)
+        // console.log(e)
         next(e)
     }
 }
@@ -34,7 +34,7 @@ exports.login = async function (req, res, next) {
         // req.session.member = find_user
         res.status(200).send({ status: true, msg: 'succes', data: null })
     } catch (e) {
-        console.log(e)
+        // console.log(e)
         next(e)
     }
 }
@@ -52,11 +52,12 @@ exports.edit_profile = async function (req, res, next) {
                 }
             })
         if (req.file && update.modifiedCount != 0) {
-            remove_file(find.img.filename).then((result) => { console.log(result) }).catch((e) => { console.log(e) })
+            // await remove_file(find.img.filename).then((result) => { console.log(result) }).catch((e) => { console.log(e) })
+            // await remove_file_test(find.img.filename)
         }
         res.status(200).send({ status: true, msg: 'succes', data: update })
     } catch (e) {
-        console.log(e)
+        // console.log(e)
         next(e)
     }
 }
@@ -72,7 +73,7 @@ exports.edit_password = async function (req, res, next) {
             })
         res.status(200).send({ status: true, msg: 'succes', data: update })
     } catch (e) {
-        console.log(e)
+        // console.log(e)
         next(e)
     }
 }
@@ -86,7 +87,7 @@ exports.logout = async function (req, res, next) {
         res.clearCookie("token");
         res.status(200).send({ status: true, msg: 'succes' })
     } catch (e) {
-        console.log(e)
+        // console.log(e)
         next(e)
     }
 }
@@ -96,7 +97,7 @@ exports.profile = async function (req, res, next) {
         let find_user = await User.findOne({ _id: req.user._id || req.session.member._id }).select('name email img')
         res.status(200).send({ status: true, msg: 'succes', data: find_user })
     } catch (e) {
-        console.log(e)
+        // console.log(e)
         next(e)
     }
 }
@@ -109,5 +110,14 @@ function remove_file(filename) {
             }
             resolve('deleted');
         })
+    })
+}
+
+async function remove_file_test(filename) {
+    await fs.unlink(`./public/uploads/${filename}`, (err) => {
+        if (err) {
+            console.log(err)
+        }
+        console.log('deleted');
     })
 }

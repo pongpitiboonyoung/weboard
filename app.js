@@ -12,7 +12,7 @@ const xss = require('xss-clean')
 const cors = require('cors')
 const mongoSanitize = require('express-mongo-sanitize');
 const app = express();
-
+var http = require("http");
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
@@ -49,6 +49,7 @@ app.use(function (req, res, next) {
 
 // error handler
 app.use(function (err, req, res, next) {
+  console.log(err)
   // set locals, only providing error in development
   // res.locals.message = err.message;
   // res.locals.error = req.app.get('env') === 'development' ? err : {};
@@ -59,10 +60,20 @@ app.use(function (err, req, res, next) {
 // create folder uploads in public
 fs.mkdir(path.join(__dirname + "/public/", 'uploads'),
   { recursive: true }, (err) => {
-  if (err) {
-    return console.error(err);
-  }
-  console.log('Directory created successfully!');
-});
+    if (err) {
+      return console.error(err);
+    }
+    console.log('Directory created successfully!');
+  });
 
-module.exports = app;
+let port = process.env.port || 3000
+
+app.listen(port,function (err) {
+  console.log('port1 :', port)
+})
+// var httpServer = http.createServer(app);
+// httpServer.listen(port, function (err) {
+//   console.log('port1 :', port)
+// });
+
+// module.exports = app;

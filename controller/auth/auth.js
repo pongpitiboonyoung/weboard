@@ -19,7 +19,7 @@ exports.auth = async function (req, res, next) {
         req.user = find_user
         next()
     } catch (e) {
-        console.log(e)
+        e.status = 401
         next(e)
     }
 }
