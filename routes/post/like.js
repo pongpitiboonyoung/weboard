@@ -6,4 +6,6 @@ const Auth = require('../../controller/auth/auth')
 router.post('/like',Auth.auth,Like.like_add)
 
 
+
+
 module.exports = router
